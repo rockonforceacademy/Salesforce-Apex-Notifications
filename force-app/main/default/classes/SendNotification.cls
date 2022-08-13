@@ -1,13 +1,13 @@
 public class SendNotification {
-    public static void send(){
-        Set<String> ids = new Set<String>();
-        String idCoisa = UserInfo.getUserId();
-        ids.add(idCoisa);
+    public static void Send(){
+        List<User> recipients = [SELECT Id FROM User];
+        Set<String> recipientIds = new Set<String>();        
+        String targetId = '0018Z00002hkcywQAA';
         
-        //List<Account> listaOtaCoisa = new List<Account>();
-        //listaOtaCoisa.add([SELECT Id FROM Account WHERE Name='Burlington Textiles Corp of America']);
-        //String idOtaCoisa = String.valueOf(ListaOtaCoisa[0]);
-        //System.debug(idOtaCoisa);
-        CustomNotificationApexTest.notifyUsers(ids, '0018Z00002hkcywQAA', 'Yan');
+        for (integer i = 0; i < recipients.size(); i++){
+            recipientIds.add(String.ValueOf(recipients[i].Id));   
+        }
+
+        CustomNotificationApexTest.notifyUsers(recipientIds, targetId, String.ValueOf(UserInfo.getName()));
     }
 }
