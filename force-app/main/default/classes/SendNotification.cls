@@ -3,7 +3,7 @@ public class SendNotification {
         List<User> recipients = [SELECT Id FROM User];
         Set<String> recipientIds = new Set<String>();        
         String targetId = '0018Z00002hkcywQAA';
-        
+                
         for (integer i = 0; i < recipients.size(); i++){
             recipientIds.add(String.ValueOf(recipients[i].Id));   
         }
