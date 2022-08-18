@@ -1,4 +1,3 @@
-trigger OppAmountTrigger on Opportunity (after update) {
-    List<Opportunity> Opp = Trigger.new;
-    ClientPotentialNotification.RetrieveOpp(Opp[0].AccountId);
+trigger OppAmountTrigger on Opportunity (after insert, after update) {
+    ClientPotentialNotification.RetrieveOpp(Trigger.new);
 }
