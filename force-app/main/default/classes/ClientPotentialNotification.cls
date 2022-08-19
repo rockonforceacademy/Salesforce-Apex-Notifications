@@ -1,49 +1,44 @@
 public with sharing class ClientPotentialNotification {
                         
-    // Metodo para atualizar o field TopClient e setar a notificacao para os envolvidos
-    public static List<Opportunity> RetrieveOpp(List<Opportunity> oppList){
-        
-        for (integer i = 0; oppList.size() < i ; i++){
+    // Update TopClient field and notify users involved
+    public static void RetrieveOpp(List<Opportunity> triggerResult){
+
+        List<Opportunity> oppList = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE ID IN :triggerResult];
+
+        List<Opportunity> updateOppList = new List<Opportunity>();
+
+        for (Opportunity opp : oppList){
             
-            if (oppList[i].Amount < 10000){
-                oppList[i].TopClient__c = 'Good';
-            } else if(1000 <= oppList[i].Amount && oppList[i].Amount < 100000){
-                oppList[i].TopClient__c = 'Very Good';                
-            } else {
-                oppList[i].TopClient__c = 'Excellent';
+            if (opp.Amount < 10000){
+                opp.TopClient__c = 'Good';
+            } else if(10000 <= opp.Amount && opp.Amount < 100000){
+                opp.TopClient__c = 'Very Good';        
+            } else if (opp.Amount > 100000) {
+                opp.TopClient__c = 'Excellent';
+            } 
+            updateOppList.add(opp);
+            
+            if (opp.StageName == 'Negotiation/Review' && opp.Amount > 10000 && opp.Type == 'New Customer'){
+                Send(String.ValueOf(opp.OwnerId),
+                     String.ValueOf(opp.Id),
+                     String.ValueOf(opp.Owner.Name));
             }
         }
-    
-        update oppList;
-    
-        for (integer i = 0; oppList.size() < i ; i++){
-            if (oppList[i].StageName == 'Negotiation\Review' && oppList[i].Amount == 10000 && oppList[i].Type == 'New Customer'){
-                Send(String.ValueOf(oppList[i].OwnerId),
-                     String.ValueOf(oppList[i].Id),
-                     String.ValueOf(oppList[i].Owner.Name));
-            }
-        }
-    
-        return oppList;
+
+        update updateOppList;
+
     }
 
-    //Metodo para enviar a notificação para o Dono da Oportunidade e para todos os usuarios
-    //com o profile de System Administrator
+    //Send notification to OpportunityOwner and SystemAdministrators
     public static void Send (String OppOwnerId, String OppId, String OppOwnerName){
          
         Set<String> SetOppOwnerId = new Set<String>();
         SetOppOwnerId.add(OppOwnerId);
-         
-        List<User> ListUser = [SELECT Id, Name FROM User WHERE Profile.Name = 'System Administrator'];
-         
-        Set<String> SysAdmIds = new Set<String>();
         
-        for (integer i = 0; ListUser.size() < i ; i++){
-                SysAdmIds.add(String.ValueOf(ListUser[i].Id));
-        }
-             
         CustomNotificationApexTest.notifyUsers(SetOppOwnerId,OppId,OppOwnerName);
-        
+         
+        List<User> ListUser = [SELECT Id, Name FROM User WHERE Profile.Name = 'System Administrator' AND (Id != :OppOwnerId)];
+
         for (User us : ListUser){
             Set<String> userSysAdminId = new Set<String>();
             userSysAdminId.add(String.ValueOf(us.Id));

@@ -1,3 +1,6 @@
 trigger OppAmountTrigger on Opportunity (after insert, after update) {
-    ClientPotentialNotification.RetrieveOpp(Trigger.new);
+
+    if (Trigger.old != Trigger.new){
+        ClientPotentialNotification.RetrieveOpp(Trigger.new);
+    }
 }
