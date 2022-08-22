@@ -10,6 +10,7 @@ trigger OppTrigger on Opportunity (after insert, after update) {
             if (oppOld.Amount != oppNew.Amount || oppOld.StageName != oppNew.StageName || oppOld.Type != oppNew.Type) {
                 oppList.add(oppNew);
             }
+            
             //this.checkAccountFiscalInformation(acc);
         }
         ClientPotentialNotification.RetrieveOpp(oppList);
