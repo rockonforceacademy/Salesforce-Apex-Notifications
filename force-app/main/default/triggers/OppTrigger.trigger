@@ -13,8 +13,8 @@ trigger OppTrigger on Opportunity (after insert, after update) {
             //this.checkAccountFiscalInformation(acc);
             
         }
-        ClientPotentialNotification.RetrieveOpp(oppList);
+        ClientPotentialNotification.UpdateTopClientAndNotify(oppList);
         } else {
-            ClientPotentialNotification.RetrieveOpp(Trigger.new);
+            ClientPotentialNotification.UpdateTopClientAndNotify(Trigger.new);
         }
 }
