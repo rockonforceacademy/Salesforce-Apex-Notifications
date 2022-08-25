@@ -1,6 +1,7 @@
 public with sharing class ClientPotentialNotification {
     // Update TopClient field and notify users involved
-    public static void UpdateTopClientAndNotify(List<Opportunity> triggerResult){
+    public static boolean UpdateTopClientAndNotify(List<Opportunity> triggerResult){
+        boolean flag = null;
         
         //Retrieve records in Trigger.New so they can be written (after-triggers lock the data as Read-Only)
         List<Opportunity> oppList = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE ID IN :triggerResult];
@@ -20,39 +21,35 @@ public with sharing class ClientPotentialNotification {
             
             //Notify users involved
             if (opp.StageName == 'Negotiation/Review' && opp.Amount > 10000 && opp.Type == 'New Customer'){
-                Send(opp.OwnerId, opp.Id, opp.Owner.Name);
+                SendNotification(opp.OwnerId, opp.Id, opp.Owner.Name);
+                flag = true;        
+            } else {
+                flag = false;
             }
         }
 
         //Update records 
         update updateOppList;
+        System.debug(flag);
+        return flag;
     }
 
     //Send notification to OpportunityOwner and SystemAdministrators
-    public static Boolean Send (String oppOwnerId, String oppId, String oppOwnerName){
-        //Notify OpportunityOwner
-        boolean flag;
+    public static void SendNotification (String oppOwnerId, String oppId, String oppOwnerName){
+        
+        //Notify OpportunityOwner        
         Set<String> setOppOwnerId = new Set<String>();
         setOppOwnerId.add(oppOwnerId);
         CustomNotificationApexTest.notifyUsers(setOppOwnerId,oppId,oppOwnerName);
          
         //Notify SystemAdministrator if different from Opportunity Owner
         List<User> listUser = [SELECT Id, Name FROM User WHERE Profile.Name = 'System Administrator' AND (Id != :oppOwnerId)];
-        Try{
             for (User us : listUser){
-                Set<String> userSysAdminId = new Set<String>();
-                userSysAdminId.add(String.ValueOf(us.Id));
-                String userSysAdminName = String.ValueOf(us.Name);
-                CustomNotificationApexTest.notifyUsers(userSysAdminId,oppId,userSysAdminName);            
-            }
-            flag = true;
-            System.debug(flag);
-            return flag;     
-        } catch (Exception e) {
-            System.debug('Não foi possível enviar a notificação: ' + e.getMessage());
-            flag = false;
-            System.debug(flag);
-            return flag;        
+            Set<String> userSysAdminId = new Set<String>();
+            userSysAdminId.add(String.ValueOf(us.Id));
+            String userSysAdminName = String.ValueOf(us.Name);
+            
+            CustomNotificationApexTest.notifyUsers(userSysAdminId,oppId,userSysAdminName);                   
         }   
     }    
 }
