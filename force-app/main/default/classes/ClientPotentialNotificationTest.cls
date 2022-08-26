@@ -1,17 +1,30 @@
-@isTest (SeeAllData=true)
+@isTest
     private class ClientPotentialNotificationTest {
         
-        @isTest static void UpdateTopClientAndNotify_Amount1to10k_Test(){
+        @TestSetup static void makeData(){
+            
+            // Opportunity opp1 = new Opportunity();
+            
+            // opp1.Name = 'opp1';
+            // opp1.CloseDate = Date.Today();
+            // opp1.StageName = 'Negotiation/Review';
+            // opp1.Amount = 5000;
+            
+            // Insert opp1;
+            
+        }
 
+        @isTest static void UpdateTopClientAndNotify_Amount1to10k_Test(){                         
+            
             Opportunity opp = new Opportunity();
-             
+            
             opp.Name = 'opp';
             opp.CloseDate = Date.Today();
             opp.StageName = 'Negotiation/Review';
             opp.Amount = 5000;
             
             Insert opp;
-            
+
             List<Opportunity> listOpp = [SELECT Id, TopClient__c FROM Opportunity WHERE Name = 'opp'];
             System.AssertEquals(listOpp[0].TopClient__c, 'Good');
         }
@@ -34,17 +47,18 @@
         @isTest static void UpdateTopClientAndNotify_Amount100kAbove_Test(){
 
             Opportunity opp = new Opportunity();
-             
+            
+            Test.startTest();
             opp.Name = 'opp';
             opp.CloseDate = Date.Today();
             opp.StageName = 'Negotiation/Review';
             opp.Amount = 500000;
             
             Insert opp;
+            Test.stopTest();
             
             List<Opportunity> listOpp = [SELECT Id, TopClient__c FROM Opportunity WHERE Name = 'opp'];
             System.AssertEquals(listOpp[0].TopClient__c, 'Excellent');
-
         }        
 
         @isTest static void UpdateTopClientAndNotify_AmountNull_Test(){
@@ -64,17 +78,16 @@
 
         @isTest static void UpdateTopClientAndNotify_NotifZeroFieldsOk_Test(){
             
-            // List<Opportunity> listOpp = new List<Opportunity>();
-            // Opportunity opp = new Opportunity();
-
-            // opp.Name = 'oppNotif';
-            // opp.CloseDate = Date.Today();
-            // opp.Type = 'Existing Customer - Upgrade';
-            // opp.StageName = 'Prospecting';
-            // opp.Amount = 50;
+            Opportunity opp = new Opportunity();
             
-            // listOpp.add(opp);
-
+            opp.Name = 'teste 0';
+            opp.CloseDate = Date.Today();
+            opp.Type = 'Existing Customer - Upgrade';
+            opp.StageName = 'Prospecting';
+            opp.Amount = 50;
+            
+            insert opp;
+            
             List<Opportunity> listOpp = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE Name = 'teste 0'];
             
             Boolean NotifReturn = ClientPotentialNotification.UpdateTopClientAndNotify(listOpp);
@@ -83,16 +96,15 @@
                 
         @isTest static void UpdateTopClientAndNotify_NotifOneFieldOk_Test(){
             
-            // List<Opportunity> listOpp = new List<Opportunity>();
-            // Opportunity opp = new Opportunity();
+            Opportunity opp = new Opportunity();
 
-            // opp.Name = 'oppNotif';
-            // opp.CloseDate = Date.Today();
-            // opp.Type = 'New Customer';
-            // opp.StageName = 'Prospecting';
-            // opp.Amount = 50;
+            opp.Name = 'teste 1';
+            opp.CloseDate = Date.Today();
+            opp.Type = 'New Customer';
+            opp.StageName = 'Prospecting';
+            opp.Amount = 50;
             
-            // listOpp.add(opp);
+            insert opp;
 
             List<Opportunity> listOpp = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE Name = 'teste 1'];
             
@@ -102,16 +114,15 @@
         
         @isTest static void UpdateTopClientAndNotify_NotifTwoFieldsOk_Test(){
             
-            // List<Opportunity> listOpp = new List<Opportunity>();
-            // Opportunity opp = new Opportunity();
+            Opportunity opp = new Opportunity();
             
-            // opp.Name = 'oppNotif';
-            // opp.CloseDate = Date.Today();
-            // opp.Type = 'New Customer';
-            // opp.StageName = 'Negotiation/Review';
-            // opp.Amount = 50;
+            opp.Name = 'teste 2';
+            opp.CloseDate = Date.Today();
+            opp.Type = 'New Customer';
+            opp.StageName = 'Negotiation/Review';
+            opp.Amount = 50;
             
-            // listOpp.add(opp);
+            insert opp;
 
             List<Opportunity> listOpp = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE Name = 'teste 2'];
             
@@ -122,25 +133,20 @@
 
         @isTest static void UpdateTopClientAndNotify_NotifThreeFieldsOk_Test(){
     
-            // List<Opportunity> listOpp = new List<Opportunity>();
-            // Opportunity opp = new Opportunity();
+            Opportunity opp = new Opportunity();
     
-            // opp.Name = 'oppNotif';
-            // opp.CloseDate = Date.Today();
-            // opp.Type = 'New Customer';
-            // opp.StageName = 'Negotiation/Review';
-            // opp.Amount = 500000;
-            // opp.OwnerId = '0058Z000008rKiOQAU';
-            // opp.Id = '0068Z00001Z5VVQQA3';
+            opp.Name = 'teste 3';
+            opp.CloseDate = Date.Today();
+            opp.Type = 'New Customer';
+            opp.StageName = 'Negotiation/Review';
+            opp.Amount = 500000;
     
-            // listOpp.add(opp);
+            insert opp;
             
             List<Opportunity> listOpp = [SELECT Id, Amount, TopClient__c, OwnerId, Owner.Name, Type, StageName FROM Opportunity WHERE Name = 'teste 3'];
             
             Boolean NotifReturn = null;
-            System.debug(listOpp);
             NotifReturn = ClientPotentialNotification.UpdateTopClientAndNotify(listOpp);
-            System.debug(NotifReturn);
             System.AssertEquals(true, NotifReturn);    
         }
 
@@ -148,8 +154,8 @@
 
             Opportunity opp = new Opportunity();
     
-            opp.OwnerId = '0058Z000008rKiOQAU';
-            opp.Id = '0068Z00001Z5VVQQA3';
+            // opp.OwnerId = '0058Z000008rKiOQAU';
+            // opp.Id = '0068Z00001Z5VVQQA3';
             // opp.Owner.Name = 'Vitor de Carvalho';
             
             Try{
