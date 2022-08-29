@@ -1,6 +1,17 @@
-trigger OppTrigger on Opportunity (after insert, after update) {
+trigger OppTrigger on Opportunity (before insert, before update) {
 
     List<Opportunity> oppList = new List<Opportunity>();
+
+        // for(Opportunity opp : Trigger.new) {
+        
+        //     Opportunity oppOld = (Opportunity)Trigger.oldMap.get(opp.Id);
+        //     Opportunity oppNew = (Opportunity)Trigger.newMap.get(opp.Id);
+        //     if (oppOld.Amount != oppNew.Amount || oppOld.StageName != oppNew.StageName || oppOld.Type != oppNew.Type) {
+        //         oppList.add(oppNew);
+        //     }           
+        // }
+
+        // ClientPotentialNotification.updateTopClientAndNotify(oppList);
 
     if (Trigger.old != null){
         for(Opportunity opp : Trigger.new) {
@@ -12,8 +23,8 @@ trigger OppTrigger on Opportunity (after insert, after update) {
             }           
         }
 
-        ClientPotentialNotification.UpdateTopClientAndNotify(oppList);
+        ClientPotentialNotification.updateTopClientAndNotify(oppList);
         } else {
-            ClientPotentialNotification.UpdateTopClientAndNotify(Trigger.new);
+            ClientPotentialNotification.updateTopClientAndNotify(Trigger.new);
         }
 }
