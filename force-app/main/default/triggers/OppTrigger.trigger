@@ -1,4 +1,4 @@
-trigger OppTrigger on Opportunity (before insert, before update) {
+trigger OppTrigger on Opportunity (after insert, after update) {
 
     List<Opportunity> oppList = new List<Opportunity>();
 
@@ -13,7 +13,7 @@ trigger OppTrigger on Opportunity (before insert, before update) {
         }
 
             ClientPotentialNotification.updateTopClientAndNotify(oppList);
-            
+
         } else {
             ClientPotentialNotification.updateTopClientAndNotify(Trigger.new);
         }
